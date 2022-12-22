@@ -1,0 +1,1 @@
+mocha --bail `ls test/*.test.js|grep -v websock`

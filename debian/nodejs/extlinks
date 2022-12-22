@@ -1,0 +1,4 @@
+debug
+@types/debug
+@types/mocha
+@types/node

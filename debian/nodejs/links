@@ -1,0 +1,2 @@
+wscat/bin/wscat	/usr/bin/wscat
+ws/node_modules wscat/node_modules

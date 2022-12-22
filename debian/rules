@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export OPENSSL_CONF=/usr/include/nodejs/openssl.cnf
+export NODE_TLS_REJECT_UNAUTHORIZED=0
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build --buildsystem=nodejs
+	debian/rules debian/wscat.1
+
+override_dh_install:
+	dh_install
+	find $(CURDIR)/debian/node-ws/usr/lib -name *.node -exec chmod 644 '{}' \;
+
+debian/wscat.1:
+	mkdir -p node_modules
+	ln -nsf .. node_modules/ws
+	help2man -N -n "Communicate over websocket" wscat/bin/wscat -o "$@"
+	rm -f node_modules/ws
+
+.PHONY: debian/clean

@@ -1,0 +1,7 @@
+---
+Archive: GitHub
+Bug-Database: https://github.com/websockets/ws/issues
+Repository: https://github.com/websockets/ws.git
+Repository-Browse: https://github.com/websockets/ws
+Bug-Submit: https://github.com/websockets/ws/issues/new
+Security-Contact: https://github.com/websockets/ws/tree/HEAD/SECURITY.md

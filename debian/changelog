@@ -1,0 +1,248 @@
+node-ws (7.5.5+~cs13.0.13-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Jenkins ]
+  * Remove constraints unnecessary since stretch
+
+  [ Yadd ]
+  * Declare compliance with policy 4.6.0
+  * Fix filenamemangle
+  * Fix GitHub tags regex
+  * Update nodejs dependency => nodejs:any
+  * Replace https-proxy-agent component by dependency to
+    node-https-proxy-agent
+  * New upstream version 7.5.5+~cs13.0.13
+  * Drop patch, now included in upstream
+  * Install SECURITY.md doc
+
+ -- Yadd <yadd@debian.org>  Tue, 09 Nov 2021 17:12:44 +0100
+
+node-ws (7.4.2+~cs18.0.8-2) unstable; urgency=medium
+
+  * Team upload
+  * Fix GitHub tags regex
+  * Fix ReDoS vulnerability (Closes: CVE-2021-32640)
+
+ -- Yadd <yadd@debian.org>  Wed, 26 May 2021 08:26:30 +0200
+
+node-ws (7.4.2+~cs18.0.8-1) unstable; urgency=medium
+
+  * Team upload
+  * Replace deprecated node-typescript-types by node-types-node
+    (Closes: #979778)
+  * New upstream version 7.4.2+~cs18.0.8
+
+ -- Xavier Guimard <yadd@debian.org>  Fri, 29 Jan 2021 06:04:52 +0100
+
+node-ws (7.4.1+~cs18.0.6-1) unstable; urgency=medium
+
+  * Team upload
+  * Set upstream metadata fields: Security-Contact.
+  * Declare compliance with policy 4.5.1
+  * Add ctype=nodejs to component(s)
+  * New upstream version 7.4.1+~cs18.0.6
+
+ -- Xavier Guimard <yadd@debian.org>  Wed, 09 Dec 2020 10:06:21 +0100
+
+node-ws (7.4.0+~cs18.0.6-1) unstable; urgency=medium
+
+  * Team upload
+  * Replace agent-base component by dependency to new node-agent-base
+    (Closes: #972541, #975819)
+    + Drop patches
+  * New upstream version 7.4.0+~cs18.0.6
+    Updates:
+     + ws 7.4.0
+     + bufferutil 4.0.2
+     + utf-8-validate 5.0.3
+
+ -- Xavier Guimard <yadd@debian.org>  Wed, 25 Nov 2020 22:49:31 +0100
+
+node-ws (7.3.1+~cs24.0.5-1) unstable; urgency=medium
+
+  * Team upload
+  * Bump debhelper compatibility level to 13
+  * Use dh-sequence-nodejs
+  * New upstream version 7.3.1+~cs24.0.5
+    Updates:
+    + ws 7.3.1
+    + agent-base 6.0.1
+    + wscat 4.0.1
+    really 7.3.1+~5.0.2+~4.0.1+~4.0.1+~5.0.0+~6.0.1
+  * Refresh patches
+
+ -- Xavier Guimard <yadd@debian.org>  Mon, 05 Oct 2020 21:52:55 +0200
+
+node-ws (7.3.0+~cs24.0.3-1) unstable; urgency=medium
+
+  * Team upload
+  * Use uscan checksum
+  * New upstream version 7.3.0+~cs24.0.3
+    Really: 7.3.0+~5.0.2+~4.0.1+~4.0.0+~5.0.0+~6.0.0
+  * Build https-proxy-agent with tsc
+  * Require node-debug ≥ 4.1.1+~cs4.1.5
+  * Remove useless debian/build_modules
+  * Update build
+  * Require node-typescript-types
+  * Update copyright
+
+ -- Xavier Guimard <yadd@debian.org>  Wed, 13 May 2020 14:08:40 +0200
+
+node-ws (7.2.1-3) unstable; urgency=medium
+
+  * Team upload
+  * Declare compliance with policy 4.5.0
+  * Fix components install and add related test (Closes: #954152)
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 17 Mar 2020 18:20:49 +0100
+
+node-ws (7.2.1-2) unstable; urgency=medium
+
+  * Team upload
+  * Back to unstable after successful tests
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 21 Jan 2020 18:56:53 +0100
+
+node-ws (7.2.1-1) experimental; urgency=medium
+
+  * Team upload
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Use secure copyright file specification URI.
+  * Bump debhelper from old 10 to 12.
+  * Set debhelper-compat version in Build-Depends.
+  * Set field Upstream-Contact in debian/copyright.
+  * Set upstream metadata fields: Bug-Submit.
+  * Remove obsolete fields Contact, Name from debian/upstream/metadata
+    (already present in machine-readable debian/copyright).
+  * Update standards version to 4.4.1, no changes needed.
+
+  [ Xavier Guimard ]
+  * Add "Rules-Requires-Root: no"
+  * Replace uscan hook by uscan components (bufferutil, utf-8-validate, wscat,
+    https-proxy-agent, agent-base)
+  * Embed async-listen for build only
+  * New upstream version 7.2.1 (Closes: #869626)
+  * Remove patches
+  * Update test
+  * Update debian/clean
+  * Use pkg-js-tools auto install
+  * Install wscat module in nodejs root dir
+  * Update copyright
+  * Add dependency to node-read
+  * Use directly wscat output for manpage
+  * Remove lintian overrides
+
+ -- Xavier Guimard <yadd@debian.org>  Mon, 20 Jan 2020 16:24:20 +0100
+
+node-ws (1.1.0+ds1.e6ddaae4-5) unstable; urgency=medium
+
+  * Add upstream/metadata
+  * Declare compliance with policy 4.3.0
+  * Add patch to fix upload size to a sane value
+    (Closes: #927671, CVE-2016-10542)
+
+ -- Xavier Guimard <yadd@debian.org>  Sun, 21 Apr 2019 08:58:55 +0200
+
+node-ws (1.1.0+ds1.e6ddaae4-4) unstable; urgency=medium
+
+  * Priority: optional
+  * Update Vcs-* fields
+  * Section javascript
+  * Unapply node-shebang patch
+  * dh 10 in compat 10 mode to simplify rules
+  * hardening
+  * copyright: Comment about repackaging
+  * Set variables for tests
+  * Fix quoting in test control (Closes: #894955)
+
+ -- Jérémy Lal <kapouer@melix.org>  Mon, 07 Jan 2019 00:09:57 +0100
+
+node-ws (1.1.0+ds1.e6ddaae4-3) unstable; urgency=medium
+
+  * Team upload
+  * Patch to increase test timeout
+  * Fix typo for override_dh_auto_clean
+  * Rewrite the way to fix failing tests
+
+ -- Jérémy Lal <kapouer@melix.org>  Tue, 20 Dec 2016 15:09:28 +0100
+
+node-ws (1.1.0+ds1.e6ddaae4-2) unstable; urgency=medium
+
+  * Team upload
+  * Use dh_nodejs
+  * Build-Depend nodejs-dev
+  * Drop dependency on node-nan (only Build-Depend)
+
+ -- Jérémy Lal <kapouer@melix.org>  Tue, 20 Dec 2016 10:57:16 +0100
+
+node-ws (1.1.0+ds1.e6ddaae4-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update to latest Standards-Version; no changes required.
+
+ -- Ximin Luo <infinity0@debian.org>  Thu, 12 May 2016 21:50:39 +0200
+
+node-ws (1.0.1+ds1.e6ddaae4-1) unstable; urgency=medium
+
+  * Use secure links for Vcs-* fields.
+  * New upstream release.
+  * Enable tests.
+
+ -- Ximin Luo <infinity0@debian.org>  Sun, 17 Jan 2016 12:46:14 +0100
+
+node-ws (1.0.0+ds1.e6ddaae4-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Ximin Luo <infinity0@debian.org>  Sun, 03 Jan 2016 23:43:44 +0100
+
+node-ws (0.8.0+ds1.e6ddaae4-2) unstable; urgency=medium
+
+  * Rebuild against nodejs 4.
+
+ -- Ximin Luo <infinity0@debian.org>  Tue, 22 Sep 2015 03:29:37 +0200
+
+node-ws (0.8.0+ds1.e6ddaae4-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Ximin Luo <infinity0@debian.org>  Mon, 31 Aug 2015 04:53:03 +0200
+
+node-ws (0.7.2+ds1.349b7460-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Use standard SOURCE_DATE_EPOCH for reproducible documentation.
+
+ -- Ximin Luo <infinity0@pwned.gg>  Thu, 18 Jun 2015 00:01:57 +0200
+
+node-ws (0.7.1+ds1.3777b1d7-1) experimental; urgency=medium
+
+  * New upstream release.
+  * Repack source tarball to contain package-specific child components.
+  * Copyright: list repacked components.
+  * Standards-Version: 3.9.6.
+  * Refresh patches.
+  * Update upstream url (einaros -> websockets).
+  * Fix help2man invocation.
+
+ -- Ximin Luo <infinity0@pwned.gg>  Fri, 17 Apr 2015 23:42:08 +0200
+
+node-ws (0.4.32-1) unstable; urgency=medium
+
+  [ Ximin Luo ]
+  * New upstream release.
+
+  [ Jérémy Lal ]
+  * Move to pkg-javascript
+  * Add autopkgtest require test
+
+ -- Ximin Luo <infinity0@pwned.gg>  Sun, 17 Aug 2014 22:53:13 +0200
+
+node-ws (0.4.30-1) unstable; urgency=low
+
+  * Initial release. (Closes: #721558)
+
+ -- Ximin Luo <infinity0@gmx.com>  Fri, 17 Jan 2014 01:39:01 +0100

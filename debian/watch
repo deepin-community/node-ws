@@ -1,0 +1,25 @@
+version=4
+opts=filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/ws-$1/,\
+dversionmangle=auto \
+https://github.com/websockets/ws/tags .*/archive/.*/v?([\d\.]+).tar.gz group
+
+opts=\
+ctype=nodejs,\
+component=utf-8-validate,\
+dversionmangle=auto,\
+filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-utf-8-validate-$1/ \
+ https://github.com/websockets/utf-8-validate/tags .*/archive/.*/v?([\d\.]+).tar.gz checksum
+
+opts=\
+ctype=nodejs,\
+component=bufferutil,\
+dversionmangle=auto,\
+filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-bufferutil-$1/ \
+ https://github.com/websockets/bufferutil/tags .*/archive/.*/v?([\d\.]+).tar.gz checksum
+
+opts=\
+ctype=nodejs,\
+component=wscat,\
+dversionmangle=auto,\
+filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-wscat-$1/ \
+ https://github.com/websockets/wscat/tags .*/archive/.*/v?([\d\.]+).tar.gz checksum
