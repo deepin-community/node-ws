@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
-/*!
- * ws: a node.js websocket client
- * Copyright(c) 2011 Einar Otto Stangvik <einaros@gmail.com>
- * MIT Licensed
- */
+'use strict';
 
 const EventEmitter = require('events');
 const fs = require('fs');
@@ -26,6 +22,7 @@ class Console extends EventEmitter {
 
     this.stdin = process.stdin;
     this.stdout = process.stdout;
+    this.stderr = process.stderr;
 
     this.readlineInterface = readline.createInterface(this.stdin, this.stdout);
 
@@ -68,13 +65,15 @@ class Console extends EventEmitter {
     if (tty.isatty(1)) {
       this.clear();
 
-      if (program.execute) color = type = '';
-      else if (!program.color) color = '';
+      if (programOptions.execute) color = type = '';
+      else if (!programOptions.color) color = '';
 
       this.stdout.write(color + type + msg + Console.Colors.Default + '\n');
       this.prompt();
     } else if (type === Console.Types.Incoming) {
       this.stdout.write(msg + '\n');
+    } else if (type === Console.Types.Error) {
+      this.stderr.write(type + msg + '\n');
     } else {
       // is a control message and we're not in a tty... drop it.
     }
@@ -110,66 +109,75 @@ const version = require('../package.json').version;
 program
   .version(version)
   .usage('[options] (--listen <port> | --connect <url>)')
-  .option('-l, --listen <port>', 'listen on port')
-  .option('-c, --connect <url>', 'connect to a WebSocket server')
-  .option('-p, --protocol <version>', 'optional protocol version')
-  .option('-o, --origin <origin>', 'optional origin')
-  .option('-x, --execute <command>', 'execute command after connecting')
-  .option('-w, --wait <seconds>', 'wait given seconds after executing command')
-  .option(
-    '-P, --show-ping-pong',
-    'print a notification when a ping or pong is received'
-  )
-  .option('--host <host>', 'optional host')
-  .option('-s, --subprotocol <protocol>', 'optional subprotocol', collect, [])
-  .option('-n, --no-check', 'do not check for unauthorized certificates')
-  .option(
-    '-H, --header <header:value>',
-    'set an HTTP header. Repeat to set multiple (--connect only)',
-    collect,
-    []
-  )
   .option(
     '--auth <username:password>',
     'add basic HTTP authentication header (--connect only)'
   )
   .option('--ca <ca>', 'specify a Certificate Authority (--connect only)')
   .option('--cert <cert>', 'specify a Client SSL Certificate (--connect only)')
+  .option('--host <host>', 'optional host')
   .option(
     '--key <key>',
     "specify a Client SSL Certificate's key (--connect only)"
   )
   .option(
-    '--passphrase [passphrase]',
-    "specify a Client SSL Certificate Key's passphrase (--connect only). " +
-      "If you don't provide a value, it will be prompted for"
+    '--max-redirects [num]',
+    'maximum number of redirects allowed (--connect only)',
+    parseInt,
+    10
   )
   .option('--no-color', 'run without color')
   .option(
-    '--slash',
-    'enable slash commands for control frames (/ping, /pong, /close ' +
-      '[code [, reason]])'
+    '--passphrase [passphrase]',
+    "specify a Client SSL Certificate Key's passphrase (--connect only). " +
+      "If you don't provide a value, it will be prompted for"
   )
   .option(
     '--proxy <[protocol://]host[:port]>',
     'connect via a proxy. Proxy must support CONNECT method'
   )
+  .option(
+    '--slash',
+    'enable slash commands for control frames (/ping [data], /pong [data], ' +
+      '/close [code [, reason]])'
+  )
+  .option('-c, --connect <url>', 'connect to a WebSocket server')
+  .option(
+    '-H, --header <header:value>',
+    'set an HTTP header. Repeat to set multiple (--connect only)',
+    collect,
+    []
+  )
+  .option('-L, --location', 'follow redirects (--connect only)')
+  .option('-l, --listen <port>', 'listen on port')
+  .option('-n, --no-check', 'do not check for unauthorized certificates')
+  .option('-o, --origin <origin>', 'optional origin')
+  .option('-p, --protocol <version>', 'optional protocol version')
+  .option(
+    '-P, --show-ping-pong',
+    'print a notification when a ping or pong is received'
+  )
+  .option('-s, --subprotocol <protocol>', 'optional subprotocol', collect, [])
+  .option('-w, --wait <seconds>', 'wait given seconds after executing command')
+  .option('-x, --execute <command>', 'execute command after connecting')
   .parse(process.argv);
 
-if (program.listen && program.connect) {
+const programOptions = program.opts();
+
+if (programOptions.listen && programOptions.connect) {
   console.error('\u001b[33merror: Use either --listen or --connect\u001b[39m');
   process.exit(-1);
 }
 
-if (program.listen) {
+if (programOptions.listen) {
   const wsConsole = new Console();
   wsConsole.pause();
 
   let ws = null;
-  const wss = new WebSocket.Server({ port: program.listen }, () => {
+  const wss = new WebSocket.Server({ port: programOptions.listen }, () => {
     wsConsole.print(
       Console.Types.Control,
-      `Listening on port ${program.listen} (press CTRL+C to quit)`,
+      `Listening on port ${programOptions.listen} (press CTRL+C to quit)`,
       Console.Colors.Green
     );
     wsConsole.clear();
@@ -223,12 +231,12 @@ if (program.listen) {
     wsConsole.print(Console.Types.Error, err.message, Console.Colors.Yellow);
     process.exit(-1);
   });
-} else if (program.connect) {
+} else if (programOptions.connect) {
   const options = {};
   const cont = () => {
     const wsConsole = new Console();
 
-    const headers = program.header.reduce((acc, cur) => {
+    const headers = programOptions.header.reduce((acc, cur) => {
       const i = cur.indexOf(':');
       const key = cur.slice(0, i);
       const value = cur.slice(i + 1);
@@ -236,39 +244,42 @@ if (program.listen) {
       return acc;
     }, {});
 
-    if (program.auth) {
+    if (programOptions.auth) {
       headers.Authorization =
-        'Basic ' + Buffer.from(program.auth).toString('base64');
+        'Basic ' + Buffer.from(programOptions.auth).toString('base64');
     }
-    if (program.host) headers.Host = program.host;
-    if (program.protocol) options.protocolVersion = +program.protocol;
-    if (program.origin) options.origin = program.origin;
-    if (!program.check) options.rejectUnauthorized = program.check;
-    if (program.ca) options.ca = fs.readFileSync(program.ca);
-    if (program.cert) options.cert = fs.readFileSync(program.cert);
-    if (program.key) options.key = fs.readFileSync(program.key);
+    if (programOptions.host) headers.Host = programOptions.host;
+    if (programOptions.protocol)
+      options.protocolVersion = +programOptions.protocol;
+    if (programOptions.origin) options.origin = programOptions.origin;
+    if (!programOptions.check)
+      options.rejectUnauthorized = programOptions.check;
+    if (programOptions.ca) options.ca = fs.readFileSync(programOptions.ca);
+    if (programOptions.cert)
+      options.cert = fs.readFileSync(programOptions.cert);
+    if (programOptions.key) options.key = fs.readFileSync(programOptions.key);
+    if (programOptions.proxy)
+      options.agent = new HttpsProxyAgent(programOptions.proxy);
+    if (programOptions.location) options.followRedirects = true;
 
-    if (program.proxy) {
-      var agent = new HttpsProxyAgent(program.proxy);
-      options.agent = agent;
-    }
+    options.maxRedirects = programOptions.maxRedirects;
+    options.headers = headers;
 
-    let connectUrl = program.connect;
+    let connectUrl = programOptions.connect;
     if (!connectUrl.match(/\w+:\/\/.*$/i)) {
       connectUrl = `ws://${connectUrl}`;
     }
 
-    options.headers = headers;
-    const ws = new WebSocket(connectUrl, program.subprotocol, options);
+    const ws = new WebSocket(connectUrl, programOptions.subprotocol, options);
 
     ws.on('open', () => {
-      if (program.execute) {
-        ws.send(program.execute);
+      if (programOptions.execute) {
+        ws.send(programOptions.execute);
         setTimeout(
           () => {
             ws.close();
           },
-          program.wait ? program.wait * 1000 : 2000
+          programOptions.wait ? programOptions.wait * 1000 : 2000
         );
       } else {
         wsConsole.print(
@@ -278,14 +289,22 @@ if (program.listen) {
         );
 
         wsConsole.on('line', (data) => {
-          if (program.slash && data[0] === '/') {
+          if (programOptions.slash && data[0] === '/') {
             const toks = data.split(/\s+/);
             switch (toks[0].substr(1)) {
-              case 'ping':
-                ws.ping(noop);
+            case 'ping':
+                if (toks.length >= 2) {
+                    ws.ping(toks[1]);
+                } else {
+                    ws.ping(noop);
+                }
                 break;
-              case 'pong':
-                ws.pong(noop);
+            case 'pong':
+                if (toks.length >= 2) {
+                    ws.pong(toks[1]);
+                } else {
+                    ws.pong(noop);
+                }
                 break;
               case 'close': {
                 let closeStatusCode = 1000;
@@ -319,7 +338,7 @@ if (program.listen) {
     });
 
     ws.on('close', (code, reason) => {
-      if (!program.execute) {
+      if (!programOptions.execute) {
         wsConsole.print(
           Console.Types.Control,
           `Disconnected (code: ${code}, reason: "${reason}")`,
@@ -339,21 +358,21 @@ if (program.listen) {
       wsConsole.print(Console.Types.Incoming, data, Console.Colors.Blue);
     });
 
-    ws.on('ping', () => {
-      if (program.showPingPong) {
+    ws.on('ping', (data) => {
+      if (programOptions.showPingPong) {
         wsConsole.print(
           Console.Types.Incoming,
-          'Received ping',
+          `Received ping (data: "${data}"`,
           Console.Colors.Blue
         );
       }
     });
 
-    ws.on('pong', () => {
-      if (program.showPingPong) {
+    ws.on('pong', (data) => {
+      if (programOptions.showPingPong) {
         wsConsole.print(
           Console.Types.Incoming,
-          'Received pong',
+          `Received pong (data: "${data}")`,
           Console.Colors.Blue
         );
       }
@@ -365,7 +384,7 @@ if (program.listen) {
     });
   };
 
-  if (program.passphrase === true) {
+  if (programOptions.passphrase === true) {
     read(
       {
         prompt: 'Passphrase: ',
@@ -377,8 +396,8 @@ if (program.listen) {
         cont();
       }
     );
-  } else if (typeof program.passphrase === 'string') {
-    options.passphrase = program.passphrase;
+  } else if (typeof programOptions.passphrase === 'string') {
+    options.passphrase = programOptions.passphrase;
     cont();
   } else {
     cont();

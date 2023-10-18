@@ -1,4 +1,5 @@
 Test-Command: wscat -V
-Depends: @ , nodejs
+Depends: @
+ , nodejs
 Restrictions: superficial
 Features: test-name=wscat-version

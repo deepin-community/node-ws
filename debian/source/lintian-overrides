@@ -1,0 +1,4 @@
+# Same author
+add-component-copyright wscat *
+# Generic types-* path
+add-component-copyright types-*
