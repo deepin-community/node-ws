@@ -1,11 +1,12 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ws
+Upstream-Contact: https://github.com/websockets/ws/issues
 Source: https://github.com/websockets/ws/
  https://github.com/websockets/bufferutil/
  https://github.com/TooTallNate/node-https-proxy-agent/
  https://github.com/websockets/utf-8-validate/
  https://github.com/websockets/wscat/
-Upstream-Contact: https://github.com/websockets/ws/issues
+ https://registry.npmjs.org/@types/ws
 
 Files: *
 Copyright: 2011 Einar Otto Stangvik <einaros@gmail.com>
@@ -14,6 +15,10 @@ License: Expat
 Files: debian/*
 Copyright: 2014-2015, Ximin Luo <infinity0@debian.org>
  2020, Yadd <yadd@debian.org>
+License: Expat
+
+Files: types-*/*
+Copyright: Microsoft Corporation
 License: Expat
 
 License: Expat

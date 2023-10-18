@@ -1,3 +1,58 @@
+node-ws (8.11.0+~cs13.7.3-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 8.11.0+~cs13.7.3
+
+ -- Yadd <yadd@debian.org>  Sat, 19 Nov 2022 08:38:27 +0100
+
+node-ws (8.10.0+~cs13.7.3-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 8.10.0+~cs13.7.3
+
+ -- Yadd <yadd@debian.org>  Thu, 27 Oct 2022 18:07:24 +0200
+
+node-ws (8.8.1+~cs13.7.3-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 8.8.1+~cs13.7.3
+
+ -- Yadd <yadd@debian.org>  Tue, 19 Jul 2022 16:02:50 +0200
+
+node-ws (8.8.0+~cs13.6.3-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 8.8.0+~cs13.6.3
+
+ -- Yadd <yadd@debian.org>  Tue, 28 Jun 2022 11:15:13 +0200
+
+node-ws (8.6.0+~cs13.6.3-1) unstable; urgency=medium
+
+  * Team upload
+  * Drop dandling link
+  * Declare compliance with policy 4.6.1
+  * New upstream version 8.6.0+~cs13.6.3
+
+ -- Yadd <yadd@debian.org>  Thu, 19 May 2022 14:49:33 +0200
+
+node-ws (8.5.0+~cs13.3.3-2) unstable; urgency=medium
+
+  * Team upload
+  * Fix autopkgtest: wscat is not a module
+
+ -- Yadd <yadd@debian.org>  Sun, 20 Feb 2022 11:30:01 +0100
+
+node-ws (8.5.0+~cs13.3.3-1) unstable; urgency=medium
+
+  * Team upload
+  * Add missing build dependency on dh addon.
+  * Components: only wscat and @types/ws
+  * New upstream version 8.5.0+~cs13.3.3
+  * Set architecture to "all"
+  * Drop dependencies to node-agent-base, node-debug, node-tinycolor
+
+ -- Yadd <yadd@debian.org>  Sun, 20 Feb 2022 11:02:02 +0100
+
 node-ws (7.5.5+~cs13.0.13-1) unstable; urgency=medium
 
   * Team upload
