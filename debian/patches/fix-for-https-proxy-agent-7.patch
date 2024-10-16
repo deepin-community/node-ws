@@ -1,0 +1,16 @@
+Description: fix for https-proxy-agent >= 7
+Author: Yadd <yadd@debian.org>
+Forwarded: not-needed
+Last-Update: 2023-11-23
+
+--- a/wscat/bin/wscat
++++ b/wscat/bin/wscat
+@@ -4,7 +4,7 @@
+ 
+ const EventEmitter = require('events');
+ const fs = require('fs');
+-const HttpsProxyAgent = require('https-proxy-agent');
++const {HttpsProxyAgent} = require('https-proxy-agent');
+ const program = require('commander');
+ const read = require('read');
+ const readline = require('readline');

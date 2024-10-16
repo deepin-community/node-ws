@@ -11,6 +11,7 @@ const net = require('net');
 const fs = require('fs');
 const os = require('os');
 
+const makeDuplexPair = require('./duplex-pair');
 const Sender = require('../lib/sender');
 const WebSocket = require('..');
 const { NOOP } = require('../lib/constants');
@@ -113,6 +114,30 @@ describe('WebSocketServer', () => {
           assert.ok(ws instanceof CustomWebSocket);
           assert.strictEqual(ws.foo, 'foo');
           wss.close(done);
+        });
+      });
+
+      it('honors the `autoPong` option', (done) => {
+        const wss = new WebSocket.Server({ autoPong: false, port: 0 }, () => {
+          const ws = new WebSocket(`ws://localhost:${wss.address().port}`);
+
+          ws.on('open', () => {
+            ws.ping();
+          });
+
+          ws.on('pong', () => {
+            done(new Error("Unexpected 'pong' event"));
+          });
+        });
+
+        wss.on('connection', (ws) => {
+          ws.on('ping', () => {
+            ws.close();
+          });
+
+          ws.on('close', () => {
+            wss.close(done);
+          });
         });
       });
     });
@@ -280,11 +305,15 @@ describe('WebSocketServer', () => {
 
     it('cleans event handlers on precreated server', (done) => {
       const server = http.createServer();
+      const listeningListenerCount = server.listenerCount('listening');
       const wss = new WebSocket.Server({ server });
 
       server.listen(0, () => {
         wss.close(() => {
-          assert.strictEqual(server.listenerCount('listening'), 0);
+          assert.strictEqual(
+            server.listenerCount('listening'),
+            listeningListenerCount
+          );
           assert.strictEqual(server.listenerCount('upgrade'), 0);
           assert.strictEqual(server.listenerCount('error'), 0);
 
@@ -514,6 +543,40 @@ describe('WebSocketServer', () => {
         });
       });
     });
+
+    it('completes a WebSocket upgrade over any duplex stream', (done) => {
+      const server = http.createServer();
+
+      server.listen(0, () => {
+        const wss = new WebSocket.Server({ noServer: true });
+
+        server.on('upgrade', (req, socket, head) => {
+          //
+          // Put a stream between the raw socket and our websocket processing.
+          //
+          const { clientSide, serverSide } = makeDuplexPair();
+
+          socket.pipe(clientSide);
+          clientSide.pipe(socket);
+
+          //
+          // Pass the other side of the stream as the socket to upgrade.
+          //
+          wss.handleUpgrade(req, serverSide, head, (ws) => {
+            ws.send('hello');
+            ws.close();
+          });
+        });
+
+        const ws = new WebSocket(`ws://localhost:${server.address().port}`);
+
+        ws.on('message', (message, isBinary) => {
+          assert.deepStrictEqual(message, Buffer.from('hello'));
+          assert.ok(!isBinary);
+          server.close(done);
+        });
+      });
+    });
   });
 
   describe('#completeUpgrade', () => {
@@ -587,6 +650,50 @@ describe('WebSocketServer', () => {
 
       wss.on('connection', () => {
         done(new Error("Unexpected 'connection' event"));
+      });
+    });
+
+    it('fails if the Upgrade header field value cannot be read', (done) => {
+      const server = http.createServer();
+      const wss = new WebSocket.Server({ noServer: true });
+
+      server.maxHeadersCount = 1;
+
+      server.on('upgrade', (req, socket, head) => {
+        assert.deepStrictEqual(req.headers, { foo: 'bar' });
+        wss.handleUpgrade(req, socket, head, () => {
+          done(new Error('Unexpected callback invocation'));
+        });
+      });
+
+      server.listen(() => {
+        const req = http.get({
+          port: server.address().port,
+          headers: {
+            foo: 'bar',
+            bar: 'baz',
+            Connection: 'Upgrade',
+            Upgrade: 'websocket'
+          }
+        });
+
+        req.on('response', (res) => {
+          assert.strictEqual(res.statusCode, 400);
+
+          const chunks = [];
+
+          res.on('data', (chunk) => {
+            chunks.push(chunk);
+          });
+
+          res.on('end', () => {
+            assert.strictEqual(
+              Buffer.concat(chunks).toString(),
+              'Invalid Upgrade header'
+            );
+            server.close(done);
+          });
+        });
       });
     });
 
@@ -1213,7 +1320,9 @@ describe('WebSocketServer', () => {
 
     it("emits the 'headers' event", (done) => {
       const wss = new WebSocket.Server({ port: 0 }, () => {
-        const ws = new WebSocket(`ws://localhost:${wss.address().port}`);
+        const ws = new WebSocket(
+          `ws://localhost:${wss.address().port}?foo=bar`
+        );
 
         ws.on('open', ws.close);
       });
@@ -1225,7 +1334,7 @@ describe('WebSocketServer', () => {
           'Connection: Upgrade'
         ]);
         assert.ok(request instanceof http.IncomingMessage);
-        assert.strictEqual(request.url, '/');
+        assert.strictEqual(request.url, '/?foo=bar');
 
         wss.on('connection', () => wss.close(done));
       });

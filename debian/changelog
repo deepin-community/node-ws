@@ -1,3 +1,21 @@
+node-ws (8.18.0+~cs13.7.11-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version (Closes: #1074236, CVE-2024-37890)
+  * Update copyright
+  * Drop unneeded dependency version constraint
+  * Declare compliance with policy 4.7.0
+
+ -- Yadd <yadd@debian.org>  Sat, 06 Jul 2024 08:24:11 +0400
+
+node-ws (8.11.0+~cs13.7.3-2) unstable; urgency=medium
+
+  * Team upload
+  * Update standards version to 4.6.2, no changes needed.
+  * Add patch for node-https-proxy-agent >= 7
+
+ -- Yadd <yadd@debian.org>  Thu, 23 Nov 2023 11:27:12 +0400
+
 node-ws (8.11.0+~cs13.7.3-1) unstable; urgency=medium
 
   * Team upload

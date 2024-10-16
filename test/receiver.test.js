@@ -2,11 +2,12 @@
 
 const assert = require('assert');
 const crypto = require('crypto');
+const EventEmitter = require('events');
 
 const PerMessageDeflate = require('../lib/permessage-deflate');
 const Receiver = require('../lib/receiver');
 const Sender = require('../lib/sender');
-const { EMPTY_BUFFER, kStatusCode } = require('../lib/constants');
+const { EMPTY_BUFFER, hasBlob, kStatusCode } = require('../lib/constants');
 
 describe('Receiver', () => {
   it('parses an unmasked text message', (done) => {
@@ -856,7 +857,7 @@ describe('Receiver', () => {
       done();
     });
 
-    receiver.write(Buffer.from([0x88, 0x01, 0x00]));
+    receiver.write(Buffer.from([0x88, 0x01]));
   });
 
   it('emits an error if a close frame contains an invalid close code', (done) => {
@@ -1060,6 +1061,44 @@ describe('Receiver', () => {
     });
   });
 
+  it("honors the 'blob' binary type", function (done) {
+    if (!hasBlob) return this.skip();
+
+    const receiver = new Receiver({ binaryType: 'blob' });
+    const frags = [
+      crypto.randomBytes(75688),
+      crypto.randomBytes(2688),
+      crypto.randomBytes(46753)
+    ];
+
+    receiver.on('message', (data, isBinary) => {
+      assert.ok(data instanceof Blob);
+      assert.ok(isBinary);
+
+      data
+        .arrayBuffer()
+        .then((arrayBuffer) => {
+          assert.deepStrictEqual(
+            Buffer.from(arrayBuffer),
+            Buffer.concat(frags)
+          );
+
+          done();
+        })
+        .catch(done);
+    });
+
+    frags.forEach((frag, i) => {
+      Sender.frame(frag, {
+        fin: i === frags.length - 1,
+        opcode: i === 0 ? 2 : 0,
+        readOnly: true,
+        mask: false,
+        rsv1: false
+      }).forEach((buf) => receiver.write(buf));
+    });
+  });
+
   it('honors the `skipUTF8Validation` option (1/2)', (done) => {
     const receiver = new Receiver({ skipUTF8Validation: true });
 
@@ -1082,5 +1121,81 @@ describe('Receiver', () => {
     });
 
     receiver.write(Buffer.from([0x88, 0x03, 0x03, 0xe8, 0xf8]));
+  });
+
+  it('honors the `allowSynchronousEvents` option', (done) => {
+    const actual = [];
+    const expected = [
+      '1',
+      '- 1',
+      '-- 1',
+      '2',
+      '- 2',
+      '-- 2',
+      '3',
+      '- 3',
+      '-- 3',
+      '4',
+      '- 4',
+      '-- 4'
+    ];
+
+    function listener(data) {
+      const message = data.toString();
+      actual.push(message);
+
+      // `queueMicrotask()` is not available in Node.js < 11.
+      Promise.resolve().then(() => {
+        actual.push(`- ${message}`);
+
+        Promise.resolve().then(() => {
+          actual.push(`-- ${message}`);
+
+          if (actual.length === 12) {
+            assert.deepStrictEqual(actual, expected);
+            done();
+          }
+        });
+      });
+    }
+
+    const receiver = new Receiver({ allowSynchronousEvents: false });
+
+    receiver.on('message', listener);
+    receiver.on('ping', listener);
+    receiver.on('pong', listener);
+
+    receiver.write(Buffer.from('8101318901328a0133820134', 'hex'));
+  });
+
+  it('does not swallow errors thrown from event handlers', (done) => {
+    const receiver = new Receiver();
+    let count = 0;
+
+    receiver.on('message', () => {
+      if (++count === 2) {
+        throw new Error('Oops');
+      }
+    });
+
+    assert.strictEqual(
+      process.listenerCount('uncaughtException'),
+      EventEmitter.usingDomains ? 2 : 1
+    );
+
+    const listener = process.listeners('uncaughtException').pop();
+
+    process.removeListener('uncaughtException', listener);
+    process.once('uncaughtException', (err) => {
+      assert.ok(err instanceof Error);
+      assert.strictEqual(err.message, 'Oops');
+
+      process.on('uncaughtException', listener);
+      done();
+    });
+
+    setImmediate(() => {
+      receiver.write(Buffer.from('82008200', 'hex'));
+    });
   });
 });

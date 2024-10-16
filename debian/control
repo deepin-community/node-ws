@@ -1,30 +1,29 @@
 Source: node-ws
-Section: javascript
-Priority: optional
 Maintainer: Debian Javascript Maintainers <pkg-javascript-devel@lists.alioth.debian.org>
-Uploaders: Ximin Luo <infinity0@debian.org>, Jérémy Lal <kapouer@melix.org>
+Uploaders: Ximin Luo <infinity0@debian.org>
+ , Jérémy Lal <kapouer@melix.org>
+Section: javascript
+Testsuite: autopkgtest-pkg-nodejs
+Priority: optional
 Build-Depends: debhelper-compat (= 13)
  , dh-sequence-nodejs
  , help2man
  , libnode-dev
  , mocha <!nocheck>
- , node-agent-base <!nocheck>
  , node-commander
- , node-debug (>= 4.1.1+~cs4.1.5) <!nocheck>
+ , node-debug <!nocheck>
  , node-expect.js <!nocheck>
  , node-gyp
- , node-https-proxy-agent
+ , node-https-proxy-agent (>= 7)
  , node-nan
  , node-read
  , node-should <!nocheck>
  , node-tinycolor
- , node-types-node
  , node-typescript
-Standards-Version: 4.6.1
+Standards-Version: 4.7.0
 Vcs-Browser: https://salsa.debian.org/js-team/node-ws
 Vcs-Git: https://salsa.debian.org/js-team/node-ws.git
 Homepage: https://github.com/websockets/ws
-Testsuite: autopkgtest-pkg-nodejs
 Rules-Requires-Root: no
 
 Package: node-ws
@@ -32,11 +31,11 @@ Architecture: all
 Depends: ${misc:Depends}
  , ${shlibs:Depends}
  , node-commander
- , node-https-proxy-agent
+ , node-https-proxy-agent (>= 7)
  , node-read
  , nodejs:any
-Provides: ${nodejs:Provides}
 Breaks: node-websocket-stream (<< 5.4.0-5~)
+Provides: ${nodejs:Provides}
 Description: RFC-6455 WebSocket implementation module for Node.js
  ws is a simple to use websocket implementation, up-to-date against RFC-6455,
  and probably the fastest WebSocket library for Node.js.
