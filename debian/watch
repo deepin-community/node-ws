@@ -10,7 +10,5 @@ dversionmangle=auto,\
 filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-wscat-$1/ \
  https://github.com/websockets/wscat/tags .*/archive/.*/v?([\d\.]+).tar.gz checksum
 
-# It is not recommended use npmregistry. Please investigate more.
-# Take a look at https://wiki.debian.org/debian/watch/
 opts="searchmode=plain,component=types-ws,ctype=nodejs,pgpmode=none,filenamemangle=s/^.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-types-ws-$1/" \
  https://registry.npmjs.org/@types/ws https://registry.npmjs.org/@types/ws/-/ws-([\d\.]+)@ARCHIVE_EXT@ checksum

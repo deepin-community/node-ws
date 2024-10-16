@@ -1,5 +1,3 @@
 debian/wscat.1
 node_modules/
 */build/
-agent-base/dist/
-agent-base/node_modules/
